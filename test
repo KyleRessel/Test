@@ -1,0 +1,171 @@
+#include <iostream>
+#include <cstdlib>
+using namespace std;
+class DNode{
+	private:
+			int element;
+			DNode *next;
+			DNode *prev;
+	public:
+			DNode(int x=0,DNode *p1=NULL,DNode *p2=NULL){
+				element=x; next=p1; prev=p2;
+			}
+			void setElement(int x){element=x;}
+			int getElement(){return element;}
+			void setNext(DNode *x){next=x;}
+			DNode* getNext(){return next;}
+			void setPrev(DNode *x){prev=x;}
+			DNode* getPrev(){return prev;}
+};
+class DList{
+	private:
+			DNode *head;
+			DNode *tail;
+			int size;
+	public:
+			DList(){
+			head=NULL;
+			tail=NULL;
+			size=0;
+			}
+			void setHead(DNode* x){head = x;}
+			DNode* getHead(){return head;}
+			void setTail(DNode* x){tail = x;}
+			DNode* getTail(){return tail;}
+			void setSize(int x){size = x;}
+			int getSize(){return size;}
+			void addFront(int x){
+				DNode *temp = new DNode;
+				(*temp).setElement(x);
+				(*temp).setPrev(NULL);
+				(*temp).setNext(head);
+				if(size==0){
+					tail = temp;
+				}else{
+					(*head).setPrev(temp);
+				}
+				head = temp;
+				size++;
+			}
+			void addAfter(int pos, int val){
+				DNode *temp = head;
+				while(temp != NULL){
+					if((*temp).getElement() == pos){
+						break;
+					}else{
+						temp = (*temp).getNext();
+					}
+				}
+				if(temp == NULL){
+					addRear(val);
+				}else{
+					DNode *newTemp = new DNode;
+					(*newTemp).setElement(val);
+					if((*temp).getNext() == NULL){
+						tail = newTemp;
+					}else{
+						DNode *temp2 = (*temp).getNext();
+						(*temp2).setPrev(newTemp);
+					}
+					(*newTemp).setNext((*temp).getNext());
+					(*temp).setNext(newTemp);
+					(*newTemp).setPrev(temp);
+					size++;
+				}	
+			}
+			void addRear(int x){
+				DNode *temp = new DNode;
+				(*temp).setElement(x);
+				(*temp).setPrev(tail);
+				(*temp).setNext(NULL);
+				if(size == 0){
+					head = temp;
+				}else{
+					(*tail).setNext(temp);
+				}
+				tail = temp;
+				size++;
+			}
+			void removeFront(){
+				if(size>0){
+					DNode *temp = head;
+					if(size == 1){
+						head = tail = NULL;
+					}else{
+						head = (*head).getNext();
+					}
+					delete temp;
+					size--;
+				}
+			}
+			void removeRear(){
+				if(size>0){
+					DNode *temp = tail;
+					if(size == 1){
+						head = tail = NULL;
+					}else{
+						tail = (*tail).getPrev();
+					}
+					delete temp;
+					size--;
+				}
+			}
+			void removeNode(int x){
+				if(size != 0){         //checking to see if the list is empty.  If it is empty, the function stops here
+					DNode *temp = head;   //creates a pointer that will be used to iterate through the List to try and find the correct node
+					while(temp != NULL){   //the while loop the iterates through the list.  stops when the get next value in a node is NULL(end of list)
+						if((*temp).getElement() == x){
+							break;     //exits loop if the node with the correct value is found
+						}else{
+							temp = (*temp).getNext();     //jumps to next node if node did not have the correct value
+						}
+					}
+					if(temp != NULL){  //only executes delete functions if the node with the correct value was found
+						if(size == 1){
+							head = tail = NULL;  
+						}else if((*temp).getPrev() == NULL){
+							head = (*head).getNext();       //sets head pointer to next node in list
+							(*head).setPrev(NULL);			//makes prev pointer in new head node not point to selected node
+						}else if((*temp).getNext() == NULL){
+							tail = (*tail).getPrev();		//sets tail pointer to previous node in list
+							(*tail).setNext(NULL);			//makes next pointer in new tail node not point to selected node
+						}else{
+							DNode *temp2 = (*temp).getNext();  //creates a pointer and sets it to Node after selected node
+							(*temp2).setPrev((*temp).getPrev());  //sets Prev pointer in Node after selected node to point to Node before selected node
+							temp2 = (*temp).getPrev();         //sets pointer to point to node before selected node
+							(*temp2).setNext((*temp).getNext());  //sets next pointer in Node before selected node to point to node after selected node
+						}
+						delete temp;     //deletes the selected node
+						size--;          //decrements the size variable to account for the deleted node
+					}
+				}
+			}
+			void print(){
+				DNode *temp = head;
+				for(int i = 0; i<size; i++){
+					cout<<(*temp).getElement()<<"	";
+					temp=(*temp).getNext();
+				}
+				cout<<endl;
+			}
+};
+int main(){
+	DList obj;
+	obj.addFront(5);
+	obj.addFront(10);
+	obj.addFront(20);
+	obj.print();
+	obj.addRear(200);
+	obj.print();
+	obj.removeNode(5);
+	obj.print();
+	for (int i=0; i<5;i++){
+		obj.addFront(1000*(i+1));
+		obj.addRear(1050*(i+1));
+	}
+	obj.removeFront();
+	obj.print();
+	obj.removeRear();
+	obj.print();
+	return 0;
+}
